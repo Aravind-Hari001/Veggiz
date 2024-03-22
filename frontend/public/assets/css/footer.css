@@ -1,0 +1,61 @@
+.user-footer{
+    margin-top: 1cm;
+    background-color: black;
+    color: #fff;
+    padding: 20px;
+}
+.user-footer .content{
+    display: flex;
+    justify-content: space-around;
+    text-align: left;
+}
+.user-footer .content .contact h1,
+.user-footer .content .categories h1{
+    font-size: 20px;
+    font-weight: 600;
+}
+.user-footer .content .contact h1::after,
+.user-footer .content .categories h1::after{
+    display: block;
+    content: '';
+    height: 2px;
+    width: 20%;
+    border-radius: 5px;
+    background-color: red;
+    margin: 1mm 0 0 5%;
+}
+.user-footer .content .contact ul li,
+.user-footer .content .categories ul li{
+    list-style: none;
+    line-height: 8mm;
+}
+.user-footer .content .contact ul i{
+    font-size: 18px;
+}
+.user-footer .content .categories .category-items,
+.user-footer .content .contact-details{
+    display: grid;
+    column-gap: 4mm;
+    grid-template-columns: auto auto;
+}
+.user-footer .content .categories .category-items li{
+    cursor: pointer;
+    list-style: unset;
+    padding-right: 3mm;
+    text-transform: capitalize;
+}
+.user-footer .content .categories .category-items li:hover{
+    color: #999;
+}
+
+@media screen and (max-width:1000px) {
+    .user-footer .content{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        text-align: left;
+    }   
+    .user-footer .content .contact ul i{
+        display: none;
+    }
+}

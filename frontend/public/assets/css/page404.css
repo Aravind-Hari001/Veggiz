@@ -1,0 +1,14 @@
+.content{
+    margin-top: 5%;
+}
+.content img{
+    height: 5cm;
+}
+.content h1{
+    font-size: 40px;
+    font-weight: 800;
+}
+.content p{
+    font-size: 25px;
+    font-weight: 600;
+}

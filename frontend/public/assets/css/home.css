@@ -1,0 +1,313 @@
+* {
+    margin: 0;
+    top: 0;
+    font-family: sans-serif;
+    scroll-behavior: smooth;
+}
+.banner{
+    margin-top: -10mm;
+    width: 100%;
+    height: 60vh;
+    background: linear-gradient(rgba(0,0,0,0.5),rgba(0, 0, 0, 0.5)),url(../images/baner.jpg);
+    background-size: cover;
+    background-attachment: fixed;
+    padding: 20px;
+}
+.banner .banner-content{
+    transform: translateY(100%);
+}
+.banner h1{
+    color: #fff;
+    text-transform: capitalize;
+    font-size: 50px;
+    font-weight: 800;
+}
+.banner h6{
+    color: #fff;
+    font-size: 40px;
+    font-weight: 600;
+    font-family: cursive;
+    text-transform: lowercase;
+}
+.categories-div {
+    display: flex;
+    justify-content: left;
+    flex-wrap: wrap;
+    margin-top: 5mm;
+}
+
+.categories-div .cover-category {
+    width: 3.5cm;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 5px;
+    background-color: wheat;
+    cursor: pointer;
+}
+
+.categories-div .cover-category img {
+    width: 100%;
+    height: 3.5cm;
+}
+
+.categories-div .cover-category p {
+    font-size: 14px;
+    font-weight: 800;
+    color: #555;
+    margin-top: 2px;
+    text-transform: capitalize;
+}
+
+/* products */
+.products {
+    margin-top: 5mm;
+}
+
+.products .card {
+    margin-bottom: 1cm;
+    border: none;
+}
+
+.products .card .card-header {
+    display: flex;
+    justify-content: space-between;
+    background: transparent;
+    border-bottom: none;
+}
+
+.products .card .card-header h2 {
+    font-size: 25px;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.products .card .card-header h6 {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 0, 0, 0.8);
+    margin-top: 3mm;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.products .card .card-body {
+    display: flex;
+    overflow-x: scroll;
+}
+
+/* scroll bar */
+.card .card-body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.products .card .card-body .scroller {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 0;
+    left: 0;
+    position: absolute;
+    z-index: 1;
+    margin-top: 5.5cm;
+}
+
+.products .card .card-body .scroller div .move-left,
+.products .card .card-body .scroller div .move-right {
+    font-size: 30px;
+    padding: 10px 20px 10px 20px;
+    border-radius: 100px;
+    background-color: rgba(160, 55, 55, 0.3);
+    transition: 0.3s ease-in-out;
+}
+
+.products .card .card-body .scroller div .move-right {
+    transform: translateX(50%);
+}
+
+.products .card .card-body .scroller div .move-left {
+    transform: translateX(-50%);
+}
+
+.products .card .card-body .scroller div .move-left:hover,
+.products .card .card-body .scroller div .move-right:hover {
+    background-color: rgba(160, 55, 55, 0.5);
+    cursor: pointer;
+}
+
+.products .card-body .content {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    margin: 0 4px 0 4px;
+    padding: 10px;
+    z-index: 1;
+}
+
+.products .card-body .content .cover-img {
+    padding: 10px;
+    height: 4cm;
+    width: 5cm;
+    overflow: hidden;
+}
+
+.products .card-body .content .cover-img img {
+    height: 100%;
+    width: 100%;
+}
+
+.products .card-body .content div p {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    text-transform: capitalize;
+}
+
+.products .card-body .content .product-name p {
+    cursor: pointer;
+}
+.products .card-body .content .measures{
+    display: flex;
+    justify-content: space-between;
+}
+.products .card-body .content .measures p {
+    font-size: 14px;
+    font-weight: 500;
+    word-spacing: 1px;
+    text-transform: lowercase;
+}
+.products .card-body .content .measures img{
+    height: 5mm;
+    width: 5mm;
+}
+.products .card-body .content .cover-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8mm;
+    height: 1cm;
+}
+
+.products .card-body .content .cover-price .price .selling-price {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.products .card-body .content .cover-price .price .actual-price {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.strike {
+    text-decoration: line-through;
+}
+
+.products .card-body .content .cover-price .btn-add {
+    padding: 8px 20px 5px 20px;
+    text-align: center;
+    border: 1px solid green;
+    height: 100%;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.products .card .card-body .content .cover-price .btn-add p {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: green;
+}
+
+.products .card-body .content .cover-price .btn-add-sub {
+    display: flex;
+    background: green;
+    color: white;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+    border: green solid 1px;
+    border-radius: 5px;
+}
+
+.products .card-body .content .cover-price .btn-add-sub span {
+    font-size: 20px;
+    font-family: 600;
+    padding: 0 10px 0 10px;
+    cursor: pointer;
+}
+
+.products .card-body .content .cover-price .btn-add-sub .count-click {
+    font-size: 16px;
+    padding: 0;
+}
+
+@media screen and (max-width:1000px) {
+    .banner{
+        margin-top: -2cm;
+    }
+    .banner .banner-content h1{
+        font-size: 40px;
+    }
+    .banner .banner-content h6{
+        font-size: 25px;
+    }
+    .wrapper {
+        margin-left: -4mm;
+        width: 100%;
+    }
+
+    .categories-div {
+        display: grid;
+        column-gap: 5px;
+        grid-template-columns: auto auto auto auto;
+        margin: -2cm 0 0 5mm;
+
+    }
+
+    .categories-div .cover-category {
+        width: 100%;
+    }
+
+    .categories-div .cover-category img {
+        height: 2cm;
+        width: 100%;
+    }
+
+    .categories-div .cover-category p {
+        font-size: 12px;
+    }
+
+    .products {
+        margin-bottom: 1cm;
+    }
+
+    .products .card-body .content {
+        border: none;
+        padding: 0;
+    }
+
+    .products .card-body .content .cover-img {
+        padding: 5px;
+        height: 3cm;
+        width: 3.5cm;
+        margin-bottom: 5mm;
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+    }
+
+    .products .card-body .content .cover-img img {
+        height: 100%;
+        width: 100%;
+    }
+
+    .products .card-body .content {
+        line-height: 2mm;
+    }
+
+    .products .card .card-body .content .cover-price .btn-add p {
+        margin-top: 2mm;
+    }
+}

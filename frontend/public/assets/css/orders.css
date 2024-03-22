@@ -1,0 +1,73 @@
+.orders{
+    margin-top: 1cm;
+}
+.products {
+    position: fixed;
+    width: 100%;
+    z-index: 10;
+    top: 5%;
+    transform: translateX(20%);
+    overflow: hidden;
+}
+
+.products .card {
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.orders .card .card-body,
+.products .card .card-body{
+    height: 12cm;
+    overflow-y: scroll;
+}
+
+.orders .card .header,
+.products .card .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px 10px 20px;
+    margin-top: 5mm;
+    border-bottom: rgba(0, 0, 0, 0.2) 1px solid;
+}
+
+.orders .card .header .title,
+.products .card .header .title{
+    font-size: 20px;
+    font-weight: 600;
+    color: #27006e;
+}
+
+.orders .card .header .cover-refresh {
+    display: flex;
+}
+
+.orders .card .header .cover-refresh p {
+    padding: 2px 5px 2px 5px;
+    background-color: rgb(23, 101, 138);
+    color: #fff;
+    border-radius: 25px;
+    margin-right: 5mm;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.products .card .header i {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.products .card .header i:hover {
+    border-radius: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.products .table tbody tr td img {
+    height: 1cm;
+}
+
+@media screen and (max-width:1000px) {
+    .products {
+        top: 5%;
+        transform: translateX(0);
+    }
+}

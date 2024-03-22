@@ -1,0 +1,179 @@
+/* edit card */
+.admin-header .edit-admin {
+    position: fixed;
+    z-index: 15;
+    width: 40%;
+    margin: 0 30% 0 30%;
+    transform: translateY(10%);
+    background-color: #fff;
+    padding: 10px 20px 10px 20px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    border: 1px solid #000;
+}
+.admin-header .edit-admin .edit-card-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.admin-header .edit-admin .edit-card-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #450086;
+}
+
+.admin-header .edit-admin .edit-card-header h2::after {
+    display: block;
+    margin-top: 2mm;
+    content: '';
+    height: 2px;
+    width: 50%;
+    background-color: #450086;
+    margin-left: 5%;
+}
+
+.admin-header .edit-admin .edit-card-header i{
+    font-size: 25px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.80);
+    cursor: pointer;
+}
+
+.admin-header .edit-admin .edit-card-header i:hover{
+    border-radius: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.admin-header .edit-admin form input{
+    margin-bottom: 5mm;
+}
+.admin-header .edit-admin .msg{
+    color: red;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* header */
+.admin-header{
+    margin-bottom: 3cm;
+}
+.admin-header nav{
+    top:0;
+    position: fixed;
+    width: 100%;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%  20px 5%;
+    z-index: 8;
+    background-color: white;
+}
+.admin-header nav div{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+    border-radius: 25px;
+    background-color: rgba(191, 219, 255, 0.541);
+    cursor: pointer;
+    color: rgb(0, 65, 150);
+    margin-left: 10px;
+}
+.admin-header nav .app-menu,
+.admin-header nav .admin-menu{
+    background-color: unset;
+    padding: 0;
+    margin: 0;
+    margin-right: 10mm;
+}
+.admin-header nav .logo{
+    background: none;
+    cursor:default;
+}
+.admin-header nav .logo p{
+    font-size: 18px;
+    font-weight: 800;
+    margin-left: -10px;
+}
+.admin-header nav div img{
+    height: 1cm;
+}
+.admin-header nav div i{
+    font-size: 25px;
+}
+.admin-header nav div p{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 2px 0 0 2mm;
+}
+.admin-header .menu{
+    position: fixed;
+    width: 0;
+    margin: 0;
+    padding: 0px;
+    top:0;
+    overflow: hidden;
+    background-color: rgb(255, 255, 255);
+    z-index: 10;
+    height: 100%;
+    border-right: 1px solid rgba(0,0,0,0.2);
+    transition: 0.3s ease-in-out;
+}
+.admin-header menu .menu-card-header,
+.admin-header menu .menu-items div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    color: rgb(0, 65, 150);
+    margin-left: 10px;   
+}
+.admin-header menu .menu-card-header h2::after{
+    content: '';
+    display: block;
+    height: 2px;
+    width: 50%;
+    margin-left: 15px;
+    margin-top: 1mm;
+    background-color: rgb(0, 65, 150);
+}
+.admin-header menu .menu-card-header i{
+    font-size: 25px;
+    border-radius: 50px;
+}
+.admin-header menu .menu-items div{
+    justify-content: left;
+    background-color: rgba(191, 219, 255, 0.541);
+    margin-top: 5mm;
+    padding: 5px 0 5px 20px;
+}
+.admin-header menu .menu-items div i{
+    font-size: 25px;
+    margin-right: 5px;
+}
+.admin-header menu .menu-items div p{
+    margin-top: 15px;
+    font-weight: 600;
+}
+.admin-header .nav-edit-user,
+.admin-header .nav-logout,
+.admin-header .menu .menu-items .nav-edit-user,
+.admin-header .menu .menu-items .nav-logout{
+    background-color: rgba(255, 217, 0, 0.4);
+}
+.admin-header nav .active,
+.admin-header .menu .active{
+    background-color: rgba(82, 148, 235, 0.7);
+}
+
+@media screen and (max-width:1000px){
+    .admin-header .edit-admin{
+        width: 100%;
+        margin: 0;
+        transform: translateY(5%);
+    }
+}

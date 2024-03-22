@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veggiz Admin</title>
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="add-catagory card" style="width: 20rem;">
+            <form action="addCatagory" method="post">
+                <input type="text" name="catagory-name">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+
+        <div class="add-catagory card" style="width: 20rem;">
+            <form action="addProduct" method="post" enctype="multipart/form-data">
+                <select class="form-control form-control">
+                    <option>Large select</option>
+                </select>
+                <input type="text" name="-name">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>
