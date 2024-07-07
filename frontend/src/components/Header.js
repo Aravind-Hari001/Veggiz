@@ -54,7 +54,15 @@ const Header = (updateCart) => {
             showEditForm();
         }
     }, [buyNow, editUser])
-    const handelClick_AddButton = (btn, p_name, price) => {
+    const handelClick_AddButton = (btn, p_name, product) => {
+        let selling = product.price;
+        let measures = product.measures;
+        try {
+            let p = document.querySelector('.p' + product.id);
+            measures = p.querySelector('select').value;
+            selling = product.price.toString().split(';')[product.measures.toString().split(';').indexOf(measures)];
+        } catch (e) { }
+        selling = Math.round(selling - (selling / 100) * product.discount);
         let add_btn = document.querySelectorAll('.btn-' + btn)
         let add_sub_btn = document.querySelectorAll('.btn-' + btn + '-add')
         for (const btn of add_btn)
@@ -62,7 +70,7 @@ const Header = (updateCart) => {
         for (const btn of add_sub_btn)
             btn.classList.remove('d-none')
         let cartData = cookies.cart;
-        cartData[p_name] = [1, price, btn]
+        cartData[p_name] = [1, selling, btn, measures]
         setCookie('cart', cartData, { path: '/' });
         add_Cart(cartData)
         let count_item = document.querySelectorAll('.count-click-' + btn)
@@ -104,7 +112,7 @@ const Header = (updateCart) => {
                 }
             }
             setCartProduct(currentProducts);
-            cartData[p_name] = [0, 0];
+            cartData[p_name] = [0, 0, null, null];
             setCookie('cart', cartData, { path: '/' });
             add_Cart(cartData);
             try {
@@ -311,7 +319,7 @@ const Header = (updateCart) => {
                             setCookie('veggiz_admin', true, { path: '/' });
                             window.location.href = "/admin";
                         }
-                        else if(response.data=='veggiz_delivery_man'){
+                        else if (response.data == 'veggiz_delivery_man') {
                             setCookie('veggiz_delivery_person', true, { path: '/' });
                             window.location.href = "/orders";
                         }
@@ -397,6 +405,7 @@ const Header = (updateCart) => {
         formData.append('name', form['name'].value)
         formData.append('address', form['address'].value)
         formData.append('product', JSON.stringify(cookies.cart));
+
         if (user != 'login' && user != 'create' && user != 'forget_password') {
             formData.append('login', "1");
         }
@@ -423,6 +432,8 @@ const Header = (updateCart) => {
                     alert_crd.querySelector('.orderId').classList.add('d-none')
                     alert_crd.querySelector('.paymentId').classList.add('d-none')
                     alert_crd.querySelector('.notes').classList.add('d-none')
+                    localStorage.setItem('cart', '')
+                    setCookie('cart', '', { path: '/' });
                 }).catch((err) => {
                     try {
                         msg.innerHTML = err.response.data;
@@ -458,6 +469,8 @@ const Header = (updateCart) => {
                                     alert_crd.querySelector('.msg').innerHTML = result.data;
                                     alert_crd.querySelector('.orderId span').innerHTML = response.data.orderId;
                                     alert_crd.querySelector('.paymentId span').innerHTML = resp.razorpay_payment_id;
+                                    localStorage.setItem('cart', '')
+                                    setCookie('cart', '', { path: '/' });
                                 }).catch(err => {
                                     try {
                                         msg.style = "color:red";
@@ -496,7 +509,9 @@ const Header = (updateCart) => {
         document.querySelector('.payment-card').classList.add('d-none')
     }
     const hideAlertCard = () => {
-        document.querySelector('.alert-card').classList.add('d-none')
+        document.querySelector('.alert-card').classList.add('d-none');
+        window.location.href = window.location.pathname;
+
     }
     const showPaymentCard = () => {
         let price = 0, itemsCount = 0;
@@ -524,7 +539,21 @@ const Header = (updateCart) => {
             form['mobile'].value = user[0].mobile;
         }
     }
-
+    const changeMeasures = (product) => {
+        let p = document.querySelector('.p' + product.id);
+        let measures = p.querySelector('select').value;
+        let price = product.price.toString().split(';')[product.measures.toString().split(';').indexOf(measures)];
+        let selling = (product.discount) ? Math.round(price - (price / 100) * product.discount) : price;
+        p.querySelector('.selling-price').innerHTML = '₹' + selling;
+        if (product.discount) p.querySelector('.actual-price').innerHTML = '₹' + price;
+        let cartData = {}
+        try {
+            cartData = cookies.cart;
+            cartData[product.product_name] = [cookies.cart[product.product_name][0], selling, cookies.cart[product.product_name][2], measures]
+            setCookie('cart', cartData, { path: '/' });
+            add_Cart(cartData)
+        } catch (e) { }
+    }
     return (
         <>
             <link href={window.location.origin + "/assets/css/user_header.css"} rel="stylesheet"></link>
@@ -597,18 +626,19 @@ const Header = (updateCart) => {
                         (<div className='cover-cart-items'>
                             <ul>
                                 {cartProduct.map(p => {
-                                    return (<li>
-                                        <div className='cart-product-container'>
+                                    return ((cookies.cart[p.product_name])?(<li>
+                                        <div className={'cart-product-container'}>
                                             <div className='img-cover'><img src={backendURL + "uploads/" + p.image} alt={p.product_name} /></div>
                                             <div className='cart-product-data'>
                                                 <p>{p.product_name}</p>
-                                                <p>{p.measures}</p>
+                                                {/* <p>{p.measures.toString().split(';')[p.price.toString().split(';').indexOf(Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))).toString())]}</p> */}
+                                                <p>{cookies.cart[p.product_name][3]}</p>
                                                 <p>
-                                                    <strong>₹{Math.round(p.price - ((p.price / 100) * p.discount))}</strong>
-                                                    <span>{p.discount != 0 ? "₹" + p.price : null}</span>
+                                                    <strong>₹{cookies.cart[p.product_name][1]}</strong>
+                                                    <span>{p.discount != 0 ? Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))) : null}</span>
                                                 </p>
                                             </div>
-                                            <div className={'btn-add btn-' + p.id} onClick={() => handelClick_AddButton(p.id, p.product_name, Math.round(p.price - ((p.price / 100) * p.discount)))}>
+                                            <div className={'btn-add btn-' + p.id} onClick={() => handelClick_AddButton(p.id, p.product_name, p)}>
                                                 <p>Add</p>
                                             </div>
                                             <div className={'btn-add-sub d-none btn-' + p.id + '-add'}>
@@ -617,7 +647,7 @@ const Header = (updateCart) => {
                                                 <span onClick={() => click_Sub(p.id, p.product_name)}>-</span>
                                             </div>
                                         </div>
-                                    </li>)
+                                    </li>):null)
                                 })}
                             </ul>
                             <div className='buy-now'>
@@ -743,19 +773,47 @@ const Header = (updateCart) => {
                     {
                         searchProducts[0].map(p => {
                             return (
-                                <div className='content'>
+                                <div className={'content p' + p.id}>
                                     <div className='cover-img' onClick={() => clickProduct(p.id)}><img src={backendURL + "uploads/" + p.image} alt={p.product_name} /></div>
                                     <div className='product-name' onClick={() => clickProduct(p.id)}><p>{p.product_name}</p></div>
                                     <div className='measures'>
-                                        <p>{p.measures}</p>
-                                        <img src={window.location.origin + '/assets/images/' + ((p.veg == '1') ? "veg.jpg" : "non-veg.png")} />
+                                        {(p.measures.toString().split(';').length > 1) ?
+                                            (cookies.cart[p.product_name]) ?
+                                                (cookies.cart[p.product_name][1]) ?
+                                                    <select onChange={() => changeMeasures(p)}>
+                                                        <option>{p.measures.toString().split(';')[p.price.toString().split(';').indexOf(Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))).toString())]}</option>
+                                                        {
+                                                            p.measures.toString().split(';').map(m => {
+                                                                return (p.measures.toString().split(';')[p.price.toString().split(';').indexOf(Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))).toString())] != m) ?
+                                                                    (<option>{m}</option>) : null;
+                                                            })}
+                                                    </select>
+                                                    :
+                                                    <select onChange={() => changeMeasures(p)}>{p.measures.toString().split(';').map(m => {
+                                                        return (<option>{m}</option>)
+                                                    })}</select> : <select onChange={() => changeMeasures(p)}>{p.measures.toString().split(';').map(m => {
+                                                        return (<option>{m}</option>)
+                                                    })}</select> :
+                                            <p>{p.measures}</p>}
+                                        {(p.veg != 2) ? <img src={window.location.origin + '/assets/images/' + ((p.veg == '1') ? "veg.jpg" : "non-veg.png")} /> : null}
                                     </div>
                                     <div className='cover-price'>
-                                        <div className='price'>
-                                            {(p.discount) ? <p className='selling-price'>₹{Math.round(p.price - ((p.price / 100) * p.discount))}</p> : <p className='selling-price'>₹{p.price}</p>}
-                                            {(p.discount) ? <p className='actual-price strike'>₹{p.price}</p> : null}
-                                        </div>
-                                        <div className={'btn-add btn-' + p.id} onClick={() => handelClick_AddButton(p.id, p.product_name, Math.round(p.price - ((p.price / 100) * p.discount)))}>
+                                        {(cookies.cart[p.product_name]) ?
+                                            (cookies.cart[p.product_name][1] != 0) ?
+                                                <div className='price'>
+                                                    <p className='selling-price'>₹{cookies.cart[p.product_name][1]}</p>
+                                                    {(p.discount != 0) ? <p className='actual-price strike'>₹{Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100)))}</p> : null}
+                                                </div> : <div className='price'>
+                                                    <p className='selling-price'>₹{Math.round(Number(p.price.toString().split(';')[0]) - ((Number(p.price.toString().split(';')[0]) / 100) * p.discount))}</p>
+                                                    {(p.discount != 0) ? <p className='actual-price strike'>₹{p.price.toString().split(';')[0]}</p> : null}
+                                                </div>
+                                            :
+                                            <div className='price'>
+                                                <p className='selling-price'>₹{Math.round(Number(p.price.toString().split(';')[0]) - ((Number(p.price.toString().split(';')[0]) / 100) * p.discount))}</p>
+                                                {(p.discount) ? <p className='actual-price strike'>₹{p.price.toString().split(';')[0]}</p> : null}
+                                            </div>
+                                        }
+                                        <div className={'btn-add btn-' + p.id} onClick={() => handelClick_AddButton(p.id, p.product_name, p)}>
                                             <p>Add</p>
                                         </div>
                                         <div className={'btn-add-sub d-none btn-' + p.id + '-add'}>

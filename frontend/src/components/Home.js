@@ -81,13 +81,21 @@ function Home() {
       }
     }
   }
-  const handelClickAddButton = (btn, p_name, price) => {
+  const handelClickAddButton = (btn, p_name, product) => {
+    let selling = product.price;
+    let measures = product.measures;
+    try {
+      let p = document.querySelector('.p' + product.id);
+      measures = p.querySelector('select').value;
+      selling = product.price.toString().split(';')[product.measures.toString().split(';').indexOf(measures)];
+    } catch (e) { }
+    selling = Math.round(selling - (selling / 100) * product.discount);
     let add_btn = document.querySelector('.products .card .card-body .content .btn-' + btn)
     let add_sub_btn = document.querySelector('.products .card .card-body .content .btn-' + btn + '-add')
     add_btn.classList.add('d-none')
     add_sub_btn.classList.remove('d-none')
     let cartData = cart;
-    cartData[p_name] = [1, price, btn]
+    cartData[p_name] = [1, selling, btn, measures]
     setCart(cartData)
     setCookie('cart', cartData, { path: '/' });
     addCart(cartData)
@@ -111,7 +119,7 @@ function Home() {
       document.querySelector('.products .card .card-body .content .count-click-' + btn).innerHTML = cartData[p_name][0];
     }
     else {
-      cartData[p_name] = [0, 0];
+      cartData[p_name] = [0, 0,null,null];
       setCart(cartData);
       setCookie('cart', cartData, { path: '/' });
       addCart(cartData)
@@ -147,6 +155,21 @@ function Home() {
   const clickProduct = (pid) => {
     window.location.href = "/product/" + pid
   }
+  const changeMeasures = (product) => {
+    let p = document.querySelector('.p' + product.id);
+    let measures = p.querySelector('select').value;
+    let price = product.price.toString().split(';')[product.measures.toString().split(';').indexOf(measures)];
+    let selling = (product.discount) ? Math.round(price - (price / 100) * product.discount) : price;
+    p.querySelector('.selling-price').innerHTML = '₹' + selling;
+    if (product.discount) p.querySelector('.actual-price').innerHTML = '₹' + price;
+    try {
+      let cartData = cart;
+      cartData[product.product_name] = [cart[product.product_name][0], selling, cart[product.product_name][2], measures]
+      setCart(cartData)
+      setCookie('cart', cartData, { path: '/' });
+      addCart(cartData)
+    } catch (e) { }
+  }
   return (
     <>
       <link href={window.location.origin + "/assets/css/home.css"} rel="stylesheet"></link>
@@ -179,21 +202,51 @@ function Home() {
                   </div>
                   <div className={"card-" + product[product.length - 1].split(' ')[0] + ' card-body'}>
                     {
-
                       product.slice(0, product.length - 1).map(p => {
-                        return (<div className='content'>
-                          <div className='cover-img' onClick={() => clickProduct(p.id)}><img src={backendURL + "uploads/" + p.image} alt={p.product_name} /></div>
-                          <div className='product-name' onClick={() => clickProduct(p.id)}><p>{p.product_name}</p></div>
-                          <div className='measures'>
-                            <p>{p.measures}</p>
-                            <img src={window.location.origin + '/assets/images/' + ((p.veg == '1') ? "veg.jpg" : "non-veg.png")} />
+
+                        return (<div className={'content p' + (p.id)}>
+                          <div className='inner-content'>
+                            <div className='cover-img' onClick={() => clickProduct(p.id)}><img src={backendURL + "uploads/" + p.image} alt={p.product_name} /></div>
+                            <div className='product-name' onClick={() => clickProduct(p.id)}><p>{p.product_name}</p></div>
+                            <div className='measures'>
+                              {(p.measures.toString().split(';').length > 1) ?
+                                (cookies.cart[p.product_name]) ?
+                                  (cookies.cart[p.product_name][1]) ?
+                                    <select onChange={() => changeMeasures(p)}>
+                                      <option>{p.measures.toString().split(';')[p.price.toString().split(';').indexOf(Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))).toString())]}</option>
+                                      {
+                                        p.measures.toString().split(';').map(m => {
+                                          return (p.measures.toString().split(';')[p.price.toString().split(';').indexOf(Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100))).toString())] != m) ?
+                                            (<option>{m}</option>) : null;
+                                        })}
+                                    </select>
+                                    :
+                                    <select onChange={() => changeMeasures(p)}>{p.measures.toString().split(';').map(m => {
+                                      return (<option>{m}</option>)
+                                    })}</select> : <select onChange={() => changeMeasures(p)}>{p.measures.toString().split(';').map(m => {
+                                      return (<option>{m}</option>)
+                                    })}</select> :
+                                <p>{p.measures}</p>}
+                              {(p.veg != 2) ? <img src={window.location.origin + '/assets/images/' + ((p.veg == '1') ? "veg.jpg" : "non-veg.png")} /> : null}
+                            </div>
                           </div>
                           <div className='cover-price'>
-                            <div className='price'>
-                              {(p.discount) ? <p className='selling-price'>₹{Math.round(p.price - ((p.price / 100) * p.discount))}</p> : <p className='selling-price'>₹{p.price}</p>}
-                              {(p.discount) ? <p className='actual-price strike'>₹{p.price}</p> : null}
-                            </div>
-                            <div className={'btn-add btn-' + p.id} onClick={() => handelClickAddButton(p.id, p.product_name, Math.round(p.price - ((p.price / 100) * p.discount)))}>
+                            {(cookies.cart[p.product_name]) ?
+                              (cookies.cart[p.product_name][1] != 0) ?
+                                <div className='price'>
+                                  <p className='selling-price'>₹{cookies.cart[p.product_name][1]}</p>
+                                  {(p.discount != 0) ? <p className='actual-price strike'>₹{Math.floor(Number(cookies.cart[p.product_name][1]) / (1 - (p.discount / 100)))}</p> : null}
+                                </div> : <div className='price'>
+                                  <p className='selling-price'>₹{Math.round(Number(p.price.toString().split(';')[0]) - ((Number(p.price.toString().split(';')[0]) / 100) * p.discount))}</p>
+                                  {(p.discount != 0) ? <p className='actual-price strike'>₹{p.price.toString().split(';')[0]}</p> : null}
+                                </div>
+                              :
+                              <div className='price'>
+                                <p className='selling-price'>₹{Math.round(Number(p.price.toString().split(';')[0]) - ((Number(p.price.toString().split(';')[0]) / 100) * p.discount))}</p>
+                                {(p.discount) ? <p className='actual-price strike'>₹{p.price.toString().split(';')[0]}</p> : null}
+                              </div>
+                            }
+                            <div className={'btn-add btn-' + p.id} onClick={() => handelClickAddButton(p.id, p.product_name, p)}>
                               <p>Add</p>
                             </div>
                             <div className={'btn-add-sub d-none btn-' + p.id + '-add'}>

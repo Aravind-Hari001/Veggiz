@@ -58,4 +58,7 @@
     .user-footer .content .contact ul i{
         display: none;
     }
+    .user-footer .content .contact ul .email{
+        font-size: 12px;
+    }
 }

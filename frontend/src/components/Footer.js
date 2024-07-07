@@ -22,14 +22,14 @@ function Footer() {
                             <div>
                                 <li>Cell :</li>
                                 <ul>
-                                    <li><i class='bx bxs-phone-call' ></i> 9876543210,</li>
-                                    <li><i class='bx bxs-phone-call' ></i> 8976543210</li>
+                                    <li><i class='bx bxs-phone-call' ></i> 6383750156,</li>
+                                    <li><i class='bx bxs-phone-call' ></i> 6381 509 292</li>
                                 </ul>
                             </div>
                             <div>
                                 <li>Email :</li>
                                 <ul>
-                                    <li><i class='bx bx-envelope' ></i> veggiz@gmail.com</li>
+                                    <li className='email'><i class='bx bx-envelope' ></i> veggiznow@gmail.com</li>
                                 </ul>
                             </div>
                         </ul>

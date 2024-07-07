@@ -7,7 +7,7 @@ const { select, dml } = require('../model/sql');
 const formidable = require('formidable');
 
 route.get('/get-catagories', (req, res) => {
-    select("SELECT `catagories`.`id`,`catagories`.`name`,`catagories`.`image`, `group`.`name` AS `group_name` FROM `catagories` INNER JOIN `group` ON `catagories`.`group_id` = `group`.`id` ORDER BY `catagories`.`name`", (err, result) => {
+    select("SELECT `catagories`.*, `group`.`name` AS `group_name` FROM `catagories` INNER JOIN `group` ON `catagories`.`group_id` = `group`.`id` ORDER BY `catagories`.`name`", (err, result) => {
         if (err) res.status(500).send('error')
         else res.json(result)
     })
@@ -24,7 +24,7 @@ route.get('/get-product', (req, res) => {
         if (err) res.send('error')
         else {
             select("SELECT COUNT(`id`) AS `count` FROM `product` WHERE `catagory_id`=" + result[0].id, (err, count) => {
-                let page = (qdata.page > 1) ? ((qdata.page - 1) * 8) : 0;
+                let page = (qdata.page > 1) ? ((qdata.page - 1) * 20) : 0;
                 select("SELECT * FROM `product` WHERE  `catagory_id`=" + result[0].id + " LIMIT 20 OFFSET " + page, (err, result) => {
                     if (err) res.status(500).send('error')
                     else res.status(200).json([result, count])
@@ -51,7 +51,7 @@ route.get('/get-search-product', (req, res) => {
 route.get('/get-search-catagory', (req, res) => {
     let qdata = url.parse(req.url, true).query;
     let search = "LOCATE('" + qdata.search + "',`catagories`.`name`)!=0 OR LOCATE('" + qdata.search + "', `group`.`name`)!=0 ";
-    select("SELECT `catagories`.`id`,`catagories`.`name`, `group`.`name` AS `group_name` FROM `catagories` INNER JOIN `group` ON `catagories`.`group_id` = `group`.`id` WHERE " + search, (err, result) => {
+    select("SELECT `catagories`.*, `group`.`name` AS `group_name` FROM `catagories` INNER JOIN `group` ON `catagories`.`group_id` = `group`.`id` WHERE " + search, (err, result) => {
         if (err) res.status(500).send('error')
         else res.status(200).json(result)
     })
@@ -95,10 +95,11 @@ route.post('/add-product', (req, res) => {
             price: fields['price'][0],
             measures: fields['measures'][0],
             discount: (fields['discount'][0] == '') ? 0 : fields['discount'],
-            veg: (fields['veg'][0] == 'Veg') ? 1 : 0,
+            veg: (fields['veg'][0] == 'Veg') ? 1 : (fields['veg'][0] == 'Non-Veg')?0:2,
             life_time: fields['life-time'][0],
             orgin: fields['orgin'][0],
-            package: fields['package'][0]
+            package: fields['package'][0],
+            description:fields['description'][0]
         }
 
         if (file.image) {
@@ -135,8 +136,8 @@ route.post('/add-product', (req, res) => {
                                 fs.copyFile(oldpath, newpath, (err) => {
                                     if (err) res.status(500).send("Fail to upload img. Server side issue");
                                     else {
-                                        let sql = "INSERT INTO `product`(`catagory_id`, `product_name`, `price`, `measures`, `discount`, `image`,`veg`,`life_time`,`orgin`,`package_type`) ";
-                                        let values = "VALUES ('" + cid + "','" + data.name + "','" + data.price + "','" + data.measures + "','" + data.discount + "','" + newName + "','" + data.veg + "','" + data.life_time + "','" + data.orgin + "','" + data.package + "')";
+                                        let sql = "INSERT INTO `product`(`catagory_id`, `product_name`, `price`, `measures`, `discount`, `image`,`veg`,`life_time`,`orgin`,`package_type`,`description`) ";
+                                        let values = "VALUES ('" + cid + "','" + data.name + "','" + data.price + "','" + data.measures + "','" + data.discount + "','" + newName + "','" + data.veg + "','" + data.life_time + "','" + data.orgin + "','" + data.package + "','"+data.description+"')";
                                         dml(sql + values, (err) => {
                                             if (err) {
                                                 fs.unlink(newpath, (err) => {
@@ -169,8 +170,8 @@ route.post('/add-product', (req, res) => {
                     select("SELECT `id` FROM  `catagories` WHERE `name`='" + data.catagory + "'", (err, result) => {
                         if (result.length != 0) {
                             let cid = result[0].id;
-                            let sql = "INSERT INTO `product`(`catagory_id`, `product_name`, `price`, `measures`, `discount`, `image`,`veg`,`life_time`,`orgin`,`package_type`) ";
-                            let values = "VALUES ('" + cid + "','" + data.name + "','" + data.price + "','" + data.measures + "','" + data.discount + "','null','" + data.veg + "','" + data.life_time + "','" + data.orgin + "','" + data.package + "')";
+                            let sql = "INSERT INTO `product`(`catagory_id`, `product_name`, `price`, `measures`, `discount`, `image`,`veg`,`life_time`,`orgin`,`package_type`,`description`) ";
+                            let values = "VALUES ('" + cid + "','" + data.name + "','" + data.price + "','" + data.measures + "','" + data.discount + "','null','" + data.veg + "','" + data.life_time + "','" + data.orgin + "','" + data.package + "','"+data.description+"')";
                             dml(sql + values, (err) => {
                                 if (err) {
                                     res.status(500).send("Fail to Add. Server side issue")
@@ -199,10 +200,11 @@ route.put('/edit-product', (req, res) => {
             price: fields['price'][0],
             measures: fields['measures'][0],
             discount: (fields['discount'][0] == '') ? 0 : fields['discount'],
-            veg: (fields['veg'][0] == 'Veg') ? 1 : 0,
+            veg: (fields['veg'][0] == 'Veg') ? 1 : (fields['veg'][0] == 'Non-Veg')?0:2,
             life_time: fields['life-time'][0],
             orgin: fields['orgin'][0],
             package: fields['package'][0],
+            description:fields['description'][0],
             id: fields['id'][0]
         }
         if (file.image) {
@@ -234,7 +236,7 @@ route.put('/edit-product', (req, res) => {
                             else {
                                 select("SELECT `image` FROM `product` WHERE `id`=" + data.id, (err, result) => {
                                     let old_img = result[0]['image'];
-                                    let sql = "UPDATE `product` SET `catagory_id`='" + cid + "', `product_name`='" + data.name + "', `price`='" + data.price + "', `measures`='" + data.measures + "', `discount`='" + data.discount + "',`veg`='" + data.veg + "',`life_time`='" + data.life_time + "',`orgin`='" + data.orgin + "',`package_type`='" + data.package + "', `image`='" + newName + "' WHERE `id`=" + data.id;
+                                    let sql = "UPDATE `product` SET `catagory_id`='" + cid + "', `product_name`='" + data.name + "', `price`='" + data.price + "', `measures`='" + data.measures + "', `discount`='" + data.discount + "',`veg`='" + data.veg + "',`life_time`='" + data.life_time + "',`orgin`='" + data.orgin + "',`package_type`='" + data.package + "', `image`='" + newName + "', `description`='"+data.description+"' WHERE `id`=" + data.id;
                                     dml(sql, (err) => {
                                         if (err) {
                                             fs.unlink(newpath, (err) => {
@@ -263,7 +265,7 @@ route.put('/edit-product', (req, res) => {
             select("SELECT `id` FROM  `catagories` WHERE `name`='" + data.catagory + "'", (err, result) => {
                 if (result.length != 0) {
                     let cid = result[0].id;
-                    let sql = "UPDATE `product` SET `catagory_id`='" + cid + "', `product_name`='" + data.name + "', `price`='" + data.price + "', `measures`='" + data.measures + "', `discount`='" + data.discount + "',`veg`='" + data.veg + "',`life_time`='" + data.life_time + "',`orgin`='" + data.orgin + "',`package_type`='" + data.package + "' WHERE `id`=" + data.id;
+                    let sql = "UPDATE `product` SET `catagory_id`='" + cid + "', `product_name`='" + data.name + "', `price`='" + data.price + "', `measures`='" + data.measures + "', `discount`='" + data.discount + "',`veg`='" + data.veg + "',`life_time`='" + data.life_time + "',`orgin`='" + data.orgin + "',`package_type`='" + data.package + "',`description`='"+data.description+"' WHERE `id`=" + data.id;
                     dml(sql, (err) => {
                         if (err) {
                             res.status(500).send("Product Name already exist");
@@ -435,6 +437,23 @@ route.put('/edit-catagory', (req, res) => {
 
     })
 })
+route.put('/set-view-category',(req,res)=>{
+    let id = url.parse(req.url, true).query.id;
+    select("SELECT `show` FROM  `catagories` WHERE `id`='" + id + "'", (err, result) => {
+        let change=0;
+        (result[0].show==0)?change=1:change=0;
+        dml("UPDATE `catagories` SET `show`="+change+" WHERE id="+id,(err)=>{
+            if (err) {
+                res.status(500).send("error");
+            }
+            else {
+                res.status(200).send("set successfully")
+                res.end()
+            }
+        })
+    });
+
+})
 route.post('/add-group', (req, res) => {
     let form = new formidable.IncomingForm();
     form.parse(req, function (err, fields) {
@@ -525,7 +544,7 @@ route.get('/get-orders', (req, res) => {
     select("SELECT `orders`.*,SUBSTRING_INDEX(`orders`.`product`,'=',-1) AS `user_status`,`user`.`name`,`user`.`mobile`,`user`.`address` FROM `orders` INNER JOIN `user` ON `user`.`id`=`orders`.`user_id`  WHERE SUBSTRING_INDEX(`product`,'=',-1)='1'", (err, user) => {
         if (err) res.status(500).send('Serverside issue. unable to fetch data');
         else {
-            select("SELECT `orders`.*,SUBSTRING_INDEX(`orders`.`product`,'=',-1) AS `user_status`,`tmp_user`.`name`,`tmp_user`.`mobile`,`tmp_user`.`address` FROM `orders` INNER JOIN `tmp_user` ON `tmp_user`.`id`=`orders`.`user_id` WHERE SUBSTRING_INDEX(`product`,'=',-1)='0';", (err, tmp_user) => {
+            select("SELECT `orders`.*,SUBSTRING_INDEX(`orders`.`product`,'=',-1) AS `user_status`,`tmp_user`.`name`,`tmp_user`.`mobile`,`tmp_user`.`address` FROM `orders` INNER JOIN `tmp_user` ON `tmp_user`.`id`=`orders`.`user_id` WHERE SUBSTRING_INDEX(`product`,'=',-1)='0'", (err, tmp_user) => {
                 if (err) res.status(500).send('Serverside issue. unable to fetch data');
                 user.push(...tmp_user)
                 res.status(200).json(user);
@@ -535,7 +554,7 @@ route.get('/get-orders', (req, res) => {
 })
 route.get('/get-order-products', (req, res) => {
     let qdata = url.parse(req.url, true).query;
-    let data = qdata.data.split('=')[0].split(';');
+    let data = qdata.data.split('=')[0].split(';');  //(prod_id:quantity:price_index(or)mesures_index;=user_id)
     let sql = "SELECT * FROM `product` WHERE "
     for (let i = 0; i < data.length - 1; i++) {
         if (i < data.length - 2) {
@@ -553,7 +572,9 @@ route.get('/get-order-products', (req, res) => {
                 for (let j = 0; j < result.length; j++) {
                     if (data[i].split(':')[0] == result[j]['id']) {
                         result[j]['quantity'] = data[i].split(':')[1];
+                        result[j]['price']=result[j]['price'].toString().split(';')[data[i].split(':')[2]];
                         result[j]['total'] = data[i].split(':')[1] * Math.round(result[j]['price'] - ((result[j]['price'] / 100) * result[j].discount))
+                        result[j]['measures']=result[j]['measures'].toString().split(';')[data[i].split(':')[2]];
                         total += result[j]['total']
                     }
                 }

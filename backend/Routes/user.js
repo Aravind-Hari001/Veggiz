@@ -11,7 +11,7 @@ const KEY = 'rzp_test_nJxm4RCOTlFAL3'
 const KEY_SECRET = 'Y5KyXTd8xKsoCKt4lFE5Fd2k'
 
 route.get('/get-some-products', (req, res) => {
-    select("SELECT `id`,`name` FROM `catagories` LIMIT 8", (err, cId) => {
+    select("SELECT `id`,`name` FROM `catagories` WHERE `show`=1", (err, cId) => {
         if (err) res.status(500).send('error')
         else {
             let sql = "SELECT * FROM `product` WHERE ";
@@ -137,13 +137,12 @@ route.post('/create-order', (req, res) => {
             login: fields['login'][0]
         }
         let cart = data.product;
-        let sql = "SELECT `price`,`discount` FROM `product` WHERE "
+        let sql = "SELECT * FROM `product` WHERE "
         let arr = []
         let order_data = ""
         for (const x in cart) {
             if (cart[x][0] != 0) {
                 arr.push([x, cart[x][2]])
-                order_data += cart[x][2] + ":" + cart[x][0] + ";"
             }
         }
         for (let i = 0; i < arr.length; i++) {
@@ -159,7 +158,14 @@ route.post('/create-order', (req, res) => {
             else {
                 let price = 0;
                 for (const x of result) {
-                    price += Math.round(x.price - ((x.price / 100) * x.discount));
+                    let measures=cart[x.product_name][3];
+                    let index=x.measures.toString().split(';').indexOf(measures);
+                    let tmp_price=Number(x.price.toString().split(';')[index])*cart[x.product_name][0];
+                    tmp_price = Math.round(tmp_price - ((tmp_price / 100) * x.discount));
+                    price+=tmp_price;
+                    // price += Math.round(price - ((price / 100) * x.discount));
+                    order_data += cart[x.product_name][2] + ":" + cart[x.product_name][0] + ":"+index+";"
+
                 }
                 if (price >= 100) {
                     select("SELECT `id` FROM `user` WHERE `mobile`='" + data.mobile + "' AND `name`='" + data.name + "'", (err, user) => {
@@ -403,13 +409,12 @@ route.post('/place-order-cash', (req, res) => {
             login: fields['login'][0]
         }
         let cart = data.product;
-        let sql = "SELECT `price`,`discount` FROM `product` WHERE ";
+        let sql = "SELECT * FROM `product` WHERE ";
         let arr = []
         let order_data = "";
         for (const x in cart) {
             if (cart[x][0] != 0) {
                 arr.push([x, cart[x][2]])
-                order_data += cart[x][2] + ":" + cart[x][0] + ";"
             }
         }
         for (let i = 0; i < arr.length; i++) {
@@ -425,7 +430,12 @@ route.post('/place-order-cash', (req, res) => {
             else {
                 let price = 0;
                 for (const x of result) {
-                    price += Math.round(x.price - ((x.price / 100) * x.discount));
+                    let measures=cart[x.product_name][3];
+                    let index=x.measures.toString().split(';').indexOf(measures);
+                    let tmp_price=Number(x.price.toString().split(';')[index])*cart[x.product_name][0];
+                    tmp_price = Math.round(tmp_price - ((tmp_price / 100) * x.discount));
+                    price+=tmp_price;
+                    order_data += cart[x.product_name][2] + ":" + cart[x.product_name][0] + ":"+index+";"
                 }
                 if (price >= 100) {
                     select("SELECT `id` FROM `user` WHERE `mobile`='" + data.mobile + "'", (err, user) => {

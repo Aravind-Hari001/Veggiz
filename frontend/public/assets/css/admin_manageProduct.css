@@ -3,6 +3,7 @@
 .delete-card {
     position: fixed;
     z-index: 10;
+    top: 10%;
     width: 40%;
     margin: 0 30% 0 30%;
     transform: translateY(10%);
@@ -200,13 +201,19 @@
 .catagory .table tbody td img {
     height: 1cm;
 }
-
+.products .table tbody td li{
+    list-style: none;
+    border-bottom: 1px dashed black;
+    line-height: 8mm;
+}
 .products .table tr button i,
 .catagory .table tr button i,
 .group .table tr button i {
     font-size: 20px;
 }
-
+.catagory .table tr input{
+    cursor: pointer;
+}
 .products .card-footer {
     display: flex;
     justify-content: start;

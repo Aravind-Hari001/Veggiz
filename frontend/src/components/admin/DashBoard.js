@@ -16,7 +16,7 @@ function DashBoard() {
     const [countNew, setNew] = useState(0)
     const [delUser, setDelUser] = useState(null)
     const [count, setCount] = useState([0, 0])
-
+    let orderItemCount= 0;
     useEffect(() => {
         axios.get(backendURL + 'admin/get-orders')
             .then(response => {
@@ -99,6 +99,7 @@ function DashBoard() {
             .then(response => {
                 setProduct(response.data[0])
                 setTotal(response.data[1])
+                orderItemCount=0;
             })
             .catch(err => {
                 try {
@@ -243,30 +244,33 @@ function DashBoard() {
                                                 <th>Image</th>
                                                 <th>Name</th>
                                                 <th>Unit</th>
+                                                <th>Quantity</th>
                                                 <th>Price</th>
                                                 <th>Discount</th>
-                                                <th>Quantity</th>
                                                 <th>Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {
                                                 products.map(p => {
+                                                    ++orderItemCount;
                                                     return (
                                                         <tr>
                                                             <td><img src={backendURL + "uploads/" + p.image} alt={p.name}></img></td>
                                                             <td>{p.product_name}</td>
                                                             <td>{p.measures}</td>
+                                                            <td>{p.quantity}</td>
                                                             <td>{p.price}</td>
                                                             <td>{p.discount}</td>
-                                                            <td>{p.quantity}</td>
                                                             <td>{p.total}</td>
                                                         </tr>
                                                     )
                                                 })
                                             }
                                             <tr>
-                                                <th colSpan={6}>Grand Total</th>
+                                                <th colSpan={3}>Total Items</th>
+                                                <th>{orderItemCount}</th>
+                                                <th colSpan={2}>Grand Total</th>
                                                 <th>{total}</th>
                                             </tr>
                                         </tbody>

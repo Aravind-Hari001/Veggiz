@@ -9,6 +9,8 @@ function Orders() {
     const [cookies, setCookie] = useCookies();
     const [products, setProduct] = useState([]);
     const [orders, setOrder] = useState([]);
+    const [totalAmount, setTotalAmount] = useState([]);
+    
     let total = 0;
 
     useEffect(() => {
@@ -28,6 +30,7 @@ function Orders() {
         axios.get(backendURL + 'admin/get-order-products?data=' + data)
             .then(response => {
                 setProduct(response.data[0])
+                setTotalAmount(response.data[1])
                 total = 0;
             })
             .catch(err => {
@@ -62,6 +65,9 @@ function Orders() {
                                                 <th>Name</th>
                                                 <th>Unit</th>
                                                 <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Discount</th>
+                                                <th>Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -74,6 +80,9 @@ function Orders() {
                                                             <td>{p.product_name}</td>
                                                             <td>{p.measures}</td>
                                                             <td>{p.quantity}</td>
+                                                            <td>{p.price}</td>
+                                                            <td>{p.discount}</td>
+                                                            <td>{p.total}</td>
                                                         </tr>
                                                     )
                                                 })
@@ -81,6 +90,8 @@ function Orders() {
                                             <tr>
                                                 <th colSpan={3}>Total Items</th>
                                                 <th>{total}</th>
+                                                <th colSpan={2}>Grand Total</th>
+                                                <th>{totalAmount}</th>
                                             </tr>
                                         </tbody>
                                     </table>

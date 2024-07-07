@@ -101,6 +101,7 @@ function ManageProduct() {
         formData.append('life-time', form['life-time'].value)
         formData.append('image', (form['product-image'].files[0] == undefined) ? "null" : form['product-image'].files[0])
         formData.append('discount', form['discount'].value.trim())
+        formData.append('description', form['description'].value)
         if (formData.get('discount') != '' && formData.get('discount') > 100) {
             errorr = true;
             msg.innerHTML = "*Discount must <=100"
@@ -198,8 +199,11 @@ function ManageProduct() {
                 edit_form['product-price'].value = data[0].price;
                 edit_form['measures'].value = data[0].measures;
                 edit_form['discount'].value = data[0].discount;
-                document.querySelector('.add-product form .veg').innerHTML = `<option selected disabled>${(data[0].veg == 1) ? "Veg" : "Non-Veg"}</option> 
-                                        <option>${(data[0].veg != 1) ? "Veg" : "Non-Veg"}</option>`;
+                edit_form['description'].value = data[0].description;
+                document.querySelector('.add-product form .veg').innerHTML = `<option selected disabled>${(data[0].veg == 1) ? "Veg" : (data[0].veg == 0) ? "Non-Veg" : "None"}</option> 
+                                        ${(data[0].veg != 1) ? '<option>Veg</option>' : null}
+                                        ${(data[0].veg != 0) ? '<option>Non-Veg</option>' : null}
+                                        ${(data[0].veg != 2) ? '<option>None</option>' : null}`;
                 edit_form['life-time'].value = data[0].life_time;
                 edit_form['orgin'].value = data[0].orgin;
                 edit_form['package'].value = data[0].package_type;
@@ -224,6 +228,7 @@ function ManageProduct() {
         setLoading(true)
         axios.get(backendURL + 'admin/get-product?catagory=' + selected.value + '&page=' + pageNo)
             .then(response => {
+                console.log(Math.ceil(response.data[1][0]['count']/ 5));
                 setCurrentCatagory(selected.value)
                 if (response.data == "error")
                     setError("Unable to fetch data")
@@ -625,6 +630,29 @@ function ManageProduct() {
             })
             .catch(err => { })
     }
+    const handelHomeView = (id) => {
+        axios.put(backendURL + 'admin/set-view-category?id=' + id)
+            .then(response => {
+                if (response.data == "error")
+                    alert("Unable to set")
+                else {
+                    axios.get(backendURL + 'admin/get-catagories')
+                        .then(response => {
+                            for (const x of response.data) {
+                                if(x.show==1){
+                                    document.querySelector('.addView-'+x.id).checked=true;
+                                }   
+                                else{
+                                    document.querySelector('.addView-'+x.id).checked=false;
+                                }
+                            }
+                        })
+                        .catch(err => { })
+                }
+            })
+            .catch(err => { })
+
+    }
     if (cookies.veggiz_admin) {
         return (
             <>
@@ -664,7 +692,7 @@ function ManageProduct() {
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Price INR *</span>
                             </div>
-                            <input type="number" name="product-price" class="form-control" placeholder="Product Price" required />
+                            <input type="text" name="product-price" class="form-control" placeholder="Product Price" required />
                         </div>
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -685,7 +713,14 @@ function ManageProduct() {
                             <select name="veg" class="form-control veg">
                                 <option>Veg</option>
                                 <option>Non-Veg</option>
+                                <option>None</option>
                             </select>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Description</span>
+                            </div>
+                            <input type="text" name="description" class="form-control" placeholder="Description" />
                         </div>
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -817,6 +852,7 @@ function ManageProduct() {
                                                 <th>Life Time</th>
                                                 <th>Country Orgin</th>
                                                 <th>Package</th>
+                                                <th>Discription</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -828,14 +864,21 @@ function ManageProduct() {
                                                             <td><img src={backendURL + "uploads/" + product.image} alt="Not Loaded" /></td>
                                                     }
                                                     <td>{product.product_name}</td>
-                                                    <td>{product.price}</td>
+                                                    <td>{product.price.toString().split(';').map(p => {
+                                                        return (<li>{p}</li>)
+                                                    })}</td>
                                                     <td>{product.discount}</td>
-                                                    <td>{Math.round(product.price - ((product.price / 100) * product.discount))}</td>
-                                                    <td>{product.measures}</td>
-                                                    <td>{(product.veg == 1) ? "Veg" : "Non-Veg"}</td>
+                                                    <td>{product.price.toString().split(';').map(p => {
+                                                        return (<li>{Math.round(p - ((p / 100) * product.discount))}</li>)
+                                                    })}</td>
+                                                    <td>{product.measures.toString().split(';').map(p => {
+                                                        return (<li>{p}</li>)
+                                                    })}</td>
+                                                    <td>{(product.veg == 1) ? "Veg" : (product.veg == 0) ? "Non-Veg" : 'None'}</td>
                                                     <td>{product.life_time}</td>
                                                     <td>{product.orgin}</td>
                                                     <td>{product.package_type}</td>
+                                                    <td>{product.description}</td>
                                                     {window.screen.width > 1000 ?
                                                         (<td className='action-btns'>
                                                             <button className='btn btn-warning btn-sm' onClick={() => showDisplayCard('edit-product', product.id)}><i class='bx bx-edit'></i></button>
@@ -887,10 +930,12 @@ function ManageProduct() {
                                                         (<td className='action-btns'>
                                                             <button className='btn btn-warning btn-sm' onClick={() => showCatagoryCard('edit-catagory', catagory.id, catagory.name, catagory.group_name)}><i class='bx bx-edit'></i></button>
                                                             <button className='mx-2 btn btn-danger btn-sm' onClick={() => showDeleteCard('catagory', catagory.id)}><i class='bx bx-trash'></i></button>
+                                                            <input type='checkbox' title='show this category in home page' checked={catagory.show==1?true:false} className={`addView-${catagory.id}`} onClick={() => handelHomeView(catagory.id)} />
                                                         </td>) :
                                                         (<td className='action-btns d-flex'>
                                                             <button className='btn btn-warning btn-sm' onClick={() => showCatagoryCard('edit-catagory', catagory.id, catagory.name, catagory.group_name)}><i class='bx bx-edit'></i></button>
                                                             <button className='mx-2 btn btn-danger btn-sm' onClick={() => showDeleteCard('catagory', catagory.id)}><i class='bx bx-trash'></i></button>
+                                                            <input type='checkbox' title='show this category in home page' checked={catagory.show==1?true:false} className={`addView-${catagory.id}`} onClick={() => handelHomeView(catagory.id)} />
                                                         </td>)
                                                     }
                                                 </tr>
@@ -944,7 +989,7 @@ function ManageProduct() {
         )
     }
     else {
-        return(<Page404></Page404>)
+        return (<Page404></Page404>)
     }
 }
 
